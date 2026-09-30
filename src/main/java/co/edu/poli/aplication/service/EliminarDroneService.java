@@ -1,4 +1,4 @@
-package co.edu.poli.aplication.servicios;
+package co.edu.poli.aplication.service;
 
 import co.edu.poli.aplication.port.in.EliminarDroneUseCase;
 import co.edu.poli.aplication.port.out.DroneRepository;

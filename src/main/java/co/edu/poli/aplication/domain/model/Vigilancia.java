@@ -11,10 +11,10 @@ public class Vigilancia extends Drone {
     }
 
     public Vigilancia(int id, String serial, String modelo,
-                      String fabricante, double peso,
+                       double peso,
                       boolean deteccionTermica) {
 
-        super(id, serial, modelo, fabricante, peso);
+        super(id, serial, modelo, peso);
         this.deteccionTermica = deteccionTermica;
     }
 

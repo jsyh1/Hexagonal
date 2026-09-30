@@ -1,4 +1,4 @@
-package co.edu.poli.aplication.servicios;
+package co.edu.poli.aplication.service;
 
 import co.edu.poli.aplication.domain.model.Drone;
 import co.edu.poli.aplication.port.in.ListarDronesUseCase;

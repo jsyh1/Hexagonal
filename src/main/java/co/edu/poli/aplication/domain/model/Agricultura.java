@@ -11,10 +11,10 @@ public class Agricultura extends Drone {
     }
 
     public Agricultura(int id, String serial, String modelo,
-                       String fabricante, double peso,
+                        double peso,
                        double capacidadTanque) {
 
-        super(id, serial, modelo, fabricante, peso);
+        super(id, serial, modelo,  peso);
         this.capacidadTanque = capacidadTanque;
     }
 

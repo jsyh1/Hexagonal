@@ -24,21 +24,20 @@ public class MysqlDroneRepository implements DroneRepository {
 
     @Override
     public Drone guardar(Drone drone) {
-        String sql = "INSERT INTO drones (`serial`, modelo, fabricante, peso) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO drone (serial , modelo, peso) VALUES ( ?, ?, ?)";
 
         try {
             Connection connection = conexion.getConnection();
             try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, drone.getSerial());
                 statement.setString(2, drone.getModelo());
-                statement.setString(3, drone.getFabricante());
-                statement.setDouble(4, drone.getPeso());
+                statement.setDouble(3, drone.getPeso());
                 statement.executeUpdate();
 
                 try (ResultSet keys = statement.getGeneratedKeys()) {
                     if (keys.next()) {
                         return new Drone(keys.getInt(1), drone.getSerial(), drone.getModelo(),
-                                drone.getFabricante(), drone.getPeso());
+                                 drone.getPeso());
                     }
                 }
                 throw new SQLException("MySQL no retornó el ID del drone creado.");
@@ -50,7 +49,7 @@ public class MysqlDroneRepository implements DroneRepository {
 
     @Override
     public Drone buscarPorId(int id) {
-        String sql = "SELECT id, `serial`, modelo, fabricante, peso FROM drones WHERE id = ?";
+        String sql = "SELECT id, serial, modelo, peso FROM drone WHERE id = ?";
 
         try {
             Connection connection = conexion.getConnection();
@@ -67,7 +66,7 @@ public class MysqlDroneRepository implements DroneRepository {
 
     @Override
     public List<Drone> buscarTodos() {
-        String sql = "SELECT id, `serial`, modelo, fabricante, peso FROM drones";
+        String sql = "SELECT id, serial, modelo, peso FROM drone";
         List<Drone> drones = new ArrayList<>();
 
         try {
@@ -86,21 +85,20 @@ public class MysqlDroneRepository implements DroneRepository {
 
     @Override
     public Drone modificar(int id, Drone drone) {
-        String sql = "UPDATE drones SET `serial` = ?, modelo = ?, fabricante = ?, peso = ? WHERE id = ?";
+        String sql = "UPDATE drone SET serial = ?, modelo = ?,  peso = ? WHERE id = ?";
 
         try {
             Connection connection = conexion.getConnection();
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, drone.getSerial());
                 statement.setString(2, drone.getModelo());
-                statement.setString(3, drone.getFabricante());
-                statement.setDouble(4, drone.getPeso());
-                statement.setInt(5, id);
+                statement.setDouble(3, drone.getPeso());
+                statement.setInt(4, id);
 
                 if (statement.executeUpdate() == 0) {
                     return null;
                 }
-                return new Drone(id, drone.getSerial(), drone.getModelo(), drone.getFabricante(), drone.getPeso());
+                return new Drone(id, drone.getSerial(), drone.getModelo(), drone.getPeso());
             }
         } catch (SQLException exception) {
             throw persistenceError("actualizar el drone", exception);
@@ -109,7 +107,7 @@ public class MysqlDroneRepository implements DroneRepository {
 
     @Override
     public void eliminarPorId(int id) {
-        String sql = "DELETE FROM drones WHERE id = ?";
+        String sql = "DELETE FROM drone WHERE id = ?";
 
         try {
             Connection connection = conexion.getConnection();
@@ -124,7 +122,7 @@ public class MysqlDroneRepository implements DroneRepository {
 
     private Drone mapDrone(ResultSet result) throws SQLException {
         return new Drone(result.getInt("id"), result.getString("serial"),
-                result.getString("modelo"), result.getString("fabricante"), result.getDouble("peso"));
+                result.getString("modelo"), result.getDouble("peso"));
     }
 
     private IllegalStateException persistenceError(String operation, SQLException cause) {

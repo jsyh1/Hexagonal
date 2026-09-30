@@ -5,11 +5,11 @@ import co.edu.poli.aplication.port.in.ActualizarDroneUseCase;
 import co.edu.poli.aplication.port.in.CrearDroneUseCase;
 import co.edu.poli.aplication.port.in.EliminarDroneUseCase;
 import co.edu.poli.aplication.port.in.ListarDronesUseCase;
-import co.edu.poli.aplication.servicios.ActualizarDroneService;
-import co.edu.poli.aplication.servicios.CrearDroneService;
-import co.edu.poli.aplication.servicios.EliminarDroneService;
-import co.edu.poli.aplication.servicios.ListarDronesService;
 import co.edu.poli.aplication.port.out.DroneRepository;
+import co.edu.poli.aplication.service.ActualizarDroneService;
+import co.edu.poli.aplication.service.CrearDroneService;
+import co.edu.poli.aplication.service.EliminarDroneService;
+import co.edu.poli.aplication.service.ListarDronesService;
 import co.edu.poli.infrastructure.persistence.MysqlDroneRepository;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -130,7 +130,7 @@ public class Controller {
 
 		try {
 			double peso = Double.parseDouble(pesoTexto);
-			return new Drone(id, serial, modelo, "", peso);
+			return new Drone(id, serial, modelo, peso);
 		} catch (NumberFormatException exception) {
 			throw new IllegalArgumentException("El peso debe ser un número válido.", exception);
 		}

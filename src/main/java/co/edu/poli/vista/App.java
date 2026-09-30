@@ -38,17 +38,9 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
 
         scene = new Scene(
-                loadFXML("/co/edu/poli/sw2/drone")
+                loadFXML("/co/edu/poli/vista/vista")
         );
 
-        // Configurar el ícono de la aplicación
-        stage.getIcons().add(
-                new Image(
-                        getClass().getResourceAsStream(
-                                "/co/edu/poli/sw2/img/logo.png"
-                        )
-                )
-        );
 
         stage.setTitle("Gestion de Drones");
         stage.setScene(scene);
