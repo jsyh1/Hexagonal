@@ -7,6 +7,7 @@ import java.util.Set;
 import co.edu.poli.aplication.domain.model.Drone;
 import co.edu.poli.aplication.domain.model.weather.Weather;
 import co.edu.poli.aplication.port.in.ConsultarClimaUseCase;
+import javafx.scene.control.Alert;
 
 public class WeatherNotificationService {
 
@@ -32,35 +33,34 @@ public class WeatherNotificationService {
     public void actualizarDesdeCiudad(String ciudad)
             throws Exception {
 
-        Weather weather = consultarClima.consultarClima(ciudad);
+        Weather clima = consultarClima.consultarClima(ciudad);
 
-        notificar(weather);
+        notificar(clima);
     }
 
-    public void notificar(Weather weather) {
-        if (weather == null) {
-            return;
+    private void notificar(Weather clima) {
+        for (Drone drone : drones) {
+            mostrarNotificacionClima(drone, clima);
         }
+    }
 
-        for (Drone dron : new HashSet<>(drones)) {
-            System.out.println(
-                    "Notificación meteorológica para el drone: "
-                    + dron.getSerial());
+    private void mostrarNotificacionClima(
+            Drone drone, Weather clima) {
 
-            System.out.println("Temperatura: "
-                    + weather.getTemperatura() + " °C");
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
 
-            System.out.println("Humedad: "
-                    + weather.getHumedad() + " %");
+        alerta.setTitle("Notificación meteorológica");
+        alerta.setHeaderText(
+                "Clima para el drone: " + drone.getSerial());
 
-            System.out.println("Velocidad del viento: "
-                    + weather.getVelocidadViento() + " km/h");
+        alerta.setContentText(
+                "Temperatura: " + clima.getTemperatura() + " °C\n"
+                + "Humedad: " + clima.getHumedad() + " %\n"
+                + "Velocidad del viento: " + clima.getVelocidadViento() + " km/h\n"
+                + "Presión atmosférica: " + clima.getPresionAtmosferica() + " hPa\n"
+                + "Visibilidad: " + clima.getVisibilidad() + " m"
+        );
 
-            System.out.println("Presión atmosférica: "
-                    + weather.getPresionAtmosferica() + " hPa");
-
-            System.out.println("Visibilidad: "
-                    + weather.getVisibilidad() + " m");
-        }
+        alerta.showAndWait();
     }
 }
