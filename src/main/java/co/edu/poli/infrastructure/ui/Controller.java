@@ -1,6 +1,7 @@
 package co.edu.poli.infrastructure.ui;
 
 import co.edu.poli.aplication.domain.model.Drone;
+import co.edu.poli.aplication.domain.model.weather.Weather;
 import co.edu.poli.aplication.port.in.ActualizarDroneUseCase;
 import co.edu.poli.aplication.port.in.CrearDroneUseCase;
 import co.edu.poli.aplication.port.in.EliminarDroneUseCase;
@@ -365,6 +366,23 @@ public class Controller {
         alerta.setTitle("Gestión de drones");
         alerta.setHeaderText(encabezado);
         alerta.setContentText(mensaje);
+        alerta.showAndWait();
+    }
+    
+    private void mostrarNotificacionClima(Drone drone, Weather clima) {
+        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+
+        alerta.setTitle("Notificación meteorológica");
+        alerta.setHeaderText("Clima para el drone: " + drone.getSerial());
+
+        alerta.setContentText(
+                "Temperatura: " + clima.getTemperatura() + " °C\n" +
+                "Humedad: " + clima.getHumedad() + " %\n" +
+                "Velocidad del viento: " + clima.getVelocidadViento() + " km/h\n" +
+                "Presión atmosférica: " + clima.getPresionAtmosferica() + " hPa\n" +
+                "Visibilidad: " + clima.getVisibilidad() + " m"
+        );
+
         alerta.showAndWait();
     }
 }
