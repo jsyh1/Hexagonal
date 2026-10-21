@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import co.edu.poli.aplication.domain.model.Drone;
 import co.edu.poli.aplication.domain.model.weather.Weather;
 import co.edu.poli.aplication.port.in.ConsultarClimaUseCase;
-
+ 
 class WeatherNotificationServiceTest {
 
     private FakeConsultarClimaUseCase consultarClima;
