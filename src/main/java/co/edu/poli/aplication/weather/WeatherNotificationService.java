@@ -3,6 +3,7 @@ package co.edu.poli.aplication.weather;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import co.edu.poli.aplication.domain.model.Drone;
 import co.edu.poli.aplication.domain.model.weather.Weather;
@@ -12,12 +13,19 @@ import javafx.scene.control.Alert;
 public class WeatherNotificationService {
 
     private final Set<Drone> drones = new HashSet<>();
-
     private final ConsultarClimaUseCase consultarClima;
+    private final BiConsumer<Drone, Weather> notificador;
 
     public WeatherNotificationService(
             ConsultarClimaUseCase consultarClima) {
+        this(consultarClima, WeatherNotificationService::mostrarNotificacionClima);
+    }
+
+    public WeatherNotificationService(
+            ConsultarClimaUseCase consultarClima,
+            BiConsumer<Drone, Weather> notificador) {
         this.consultarClima = consultarClima;
+        this.notificador = notificador;
     }
 
     public void suscribir(Drone dron) {
@@ -40,11 +48,11 @@ public class WeatherNotificationService {
 
     private void notificar(Weather clima) {
         for (Drone drone : drones) {
-            mostrarNotificacionClima(drone, clima);
+            notificador.accept(drone, clima);
         }
     }
 
-    private void mostrarNotificacionClima(
+    private static void mostrarNotificacionClima(
             Drone drone, Weather clima) {
 
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
