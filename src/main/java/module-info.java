@@ -3,6 +3,8 @@ module co.edu.poli {
     requires javafx.fxml;
 	requires java.sql;
 	requires io.github.cdimascio.dotenv.java;
+	requires java.net.http;
+	requires com.fasterxml.jackson.databind;
   
     opens co.edu.poli.vista to javafx.fxml;
 
