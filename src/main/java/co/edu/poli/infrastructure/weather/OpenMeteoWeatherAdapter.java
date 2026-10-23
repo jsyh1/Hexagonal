@@ -13,11 +13,24 @@ import co.edu.poli.aplication.domain.model.weather.*;
 import co.edu.poli.aplication.port.out.GeocodingPort.Coordenadas;
 import co.edu.poli.aplication.port.out.WeatherApiPort;
 
+/** Adaptador que obtiene las condiciones meteorológicas desde Open-Meteo. */
 public class OpenMeteoWeatherAdapter implements WeatherApiPort {
 
 	private final HttpClient httpClient = HttpClient.newHttpClient();
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /** Crea un adaptador meteorológico con un cliente HTTP predeterminado. */
+    public OpenMeteoWeatherAdapter() {
+    }
+
+    /**
+     * Consulta el pronóstico actual para las coordenadas indicadas.
+     *
+     * @param coordenadas ubicación de la consulta
+     * @return observación meteorológica actual
+     * @throws Exception si falla la petición o la respuesta no contiene datos
+     *         meteorológicos válidos
+     */
 	@Override
 	public Weather consultarClima(Coordenadas coordenadas) throws Exception {
 

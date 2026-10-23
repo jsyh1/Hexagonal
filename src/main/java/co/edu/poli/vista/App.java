@@ -6,7 +6,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -22,6 +21,10 @@ import javafx.stage.Stage;
  * @version 1.0
  */
 public class App extends Application {
+
+    /** Crea la aplicación JavaFX de gestión de drones. */
+    public App() {
+    }
 
     /**
      * Escena principal de la aplicación JavaFX.
