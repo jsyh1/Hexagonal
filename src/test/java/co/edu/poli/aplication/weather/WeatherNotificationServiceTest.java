@@ -3,6 +3,7 @@ package co.edu.poli.aplication.weather;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -20,15 +21,20 @@ class WeatherNotificationServiceTest {
 
     private FakeConsultarClimaUseCase consultarClima;
     private List<Drone> dronesNotificados;
+    private List<Weather> climasNotificados;
     private WeatherNotificationService service;
 
     @BeforeEach
     void setUp() {
         consultarClima = new FakeConsultarClimaUseCase();
         dronesNotificados = new ArrayList<>();
+        climasNotificados = new ArrayList<>();
         service = new WeatherNotificationService(
                 consultarClima,
-                (drone, clima) -> dronesNotificados.add(drone)
+                (drone, clima) -> {
+                    dronesNotificados.add(drone);
+                    climasNotificados.add(clima);
+                }
         );
     }
 
@@ -48,6 +54,37 @@ class WeatherNotificationServiceTest {
         assertEquals(2, dronesNotificados.size());
         assertTrue(dronesNotificados.contains(drone1));
         assertTrue(dronesNotificados.contains(drone2));
+    }
+
+    @Test
+    void debeNotificarConElClimaRecibidoSinConsultarLaApi() {
+        Drone drone = new Drone(1, "D-001", "Mavic", 1.5);
+        Weather clima = new Weather(99L, 23.5, 50.0, 18.0, 1012.0, 8000.0);
+        service.suscribir(drone);
+
+        service.notificar(clima);
+
+        assertEquals(0, consultarClima.invocaciones);
+        assertEquals(List.of(drone), dronesNotificados);
+        assertSame(clima, climasNotificados.get(0));
+    }
+
+    @Test
+    void debeIncluirLaViabilidadEnLaNotificacion() {
+        List<String> viabilidadesNotificadas = new ArrayList<>();
+        Drone drone = new Drone(1, "D-001", "Mavic", 1.5);
+        Weather clima = new Weather(99L, 23.5, 50.0, 18.0, 1012.0, 8000.0);
+        String viabilidad = "CLIMA NO APTO PARA OPERACIÓN DE DRONES";
+        WeatherNotificationService serviceConEvaluacion =
+                new WeatherNotificationService(
+                        consultarClima,
+                        (notificado, climaNotificado, resultado) ->
+                                viabilidadesNotificadas.add(resultado));
+        serviceConEvaluacion.suscribir(drone);
+
+        serviceConEvaluacion.notificar(clima, viabilidad);
+
+        assertEquals(List.of(viabilidad), viabilidadesNotificadas);
     }
 
     @Test

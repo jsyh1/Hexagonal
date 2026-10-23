@@ -170,8 +170,7 @@
                     <ChoiceBox fx:id="cbTipo"
                                prefWidth="200"
                                style="-fx-background-radius: 5;
-                                      -fx-border-radius: 5;
-                                      -fx-border-color: #d0d5da;"
+                                      -fx-border-radius: 5;"
                                GridPane.columnIndex="1"
                                GridPane.rowIndex="2">
 
@@ -186,7 +185,21 @@
                             <String fx:value="Seleccionar" />
                         </value>
 
+
+                     <!-- CIUDAD -->
                     </ChoiceBox>
+                    <Label style="-fx-font-weight: 600;
+                                  -fx-text-fill: #566573;"
+                           text="Ciudad:"
+                           GridPane.columnIndex="2"
+                           GridPane.rowIndex="2" />
+                     <ChoiceBox fx:id="cbCiudad" 
+                            prefHeight="25.0"
+                            prefWidth="69.0"
+                            style="fx-background-radius: 5;
+                            -fx-border-radius: 5;"
+                            GridPane.columnIndex="3"
+                            GridPane.rowIndex="2"   />
 
                 </GridPane>
 
@@ -239,16 +252,35 @@
                                    -fx-background-radius: 5;
                                    -fx-cursor: hand;"
                             text="Eliminar" />
-  <ChoiceBox fx:id="cbCiudad" prefWidth="150.0" />
+                     
 
-    <Button text="Suscribir"
-            onAction="#suscribirDrone" />
+                     <Button text="Suscribir"
+                            prefHeight="25.0"
+                            prefWidth="69.0"
+                            style="-fx-background-color: #3bad2e;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 5;
+                                   -fx-cursor: hand;"
+                            onAction="#suscribirDrone" />
 
-    <Button text="Desuscribir"
-            onAction="#desuscribirDrone" />
+                     <Button text="Desuscribir"
+                            prefHeight="25.0"
+                            style="-fx-background-color: #e7673c;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 5;
+                                   -fx-cursor: hand;"
+                            onAction="#desuscribirDrone" />
 
-    <Button text="Notificar"
-            onAction="#notificarDrones" />
+                     <Button text="Notificar"
+                            prefHeight="25.0"
+                            style="-fx-background-color: #3c92e7;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 5;
+                                   -fx-cursor: hand;"
+                            onAction="#notificarDrones" />
                 </HBox>
 
             </VBox>

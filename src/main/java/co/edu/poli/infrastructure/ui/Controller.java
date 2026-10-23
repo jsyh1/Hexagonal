@@ -1,26 +1,27 @@
 package co.edu.poli.infrastructure.ui;
 
+import java.io.IOException;
+
 import co.edu.poli.aplication.domain.model.Drone;
-import co.edu.poli.aplication.domain.model.weather.Weather;
 import co.edu.poli.aplication.port.in.ActualizarDroneUseCase;
+import co.edu.poli.aplication.port.in.ConsultarClimaUseCase;
 import co.edu.poli.aplication.port.in.CrearDroneUseCase;
 import co.edu.poli.aplication.port.in.EliminarDroneUseCase;
+import co.edu.poli.aplication.port.in.EvaluarViabilidadVueloUseCase;
 import co.edu.poli.aplication.port.in.ListarDronesUseCase;
 import co.edu.poli.aplication.port.out.DroneRepository;
-import co.edu.poli.aplication.service.ActualizarDroneService;
-import co.edu.poli.aplication.service.CrearDroneService;
-import co.edu.poli.aplication.service.EliminarDroneService;
-import co.edu.poli.aplication.service.ListarDronesService;
-import co.edu.poli.infrastructure.persistence.MysqlDroneRepository;
-
-import co.edu.poli.aplication.weather.WeatherNotificationService;
-import co.edu.poli.aplication.port.in.ConsultarClimaUseCase;
 import co.edu.poli.aplication.port.out.GeocodingPort;
 import co.edu.poli.aplication.port.out.WeatherApiPort;
+import co.edu.poli.aplication.service.ActualizarDroneService;
 import co.edu.poli.aplication.service.ConsultarClimaService;
+import co.edu.poli.aplication.service.CrearDroneService;
+import co.edu.poli.aplication.service.EliminarDroneService;
+import co.edu.poli.aplication.service.EvaluarViabilidadVueloService;
+import co.edu.poli.aplication.service.ListarDronesService;
+import co.edu.poli.aplication.weather.WeatherNotificationService;
+import co.edu.poli.infrastructure.persistence.MysqlDroneRepository;
 import co.edu.poli.infrastructure.weather.OpenMeteoGeocodingAdapter;
 import co.edu.poli.infrastructure.weather.OpenMeteoWeatherAdapter;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -30,9 +31,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.io.IOException;
-
+/** Controlador de la interfaz JavaFX de gestión de drones y clima. */
 public class Controller {
+
+    /** Crea el controlador que conecta la interfaz con los casos de uso. */
+    public Controller() {
+    }
 
     @FXML
     private TextField txtId;
@@ -82,23 +86,30 @@ public class Controller {
     private final ListarDronesUseCase listarDrones =
             new ListarDronesService(droneRepository);
 
+    private final ConsultarClimaUseCase consultarClima =
+            crearConsultarClimaService();
+
     // Servicio que administra las suscripciones meteorológicas.
     private final WeatherNotificationService weatherService =
             crearWeatherNotificationService();
 
+    /** Crea el servicio que administra las suscripciones a notificaciones. */
     private WeatherNotificationService crearWeatherNotificationService() {
+        return new WeatherNotificationService(consultarClima);
+    }
+
+    /** Configura los adaptadores de geocodificación y consulta meteorológica. */
+    private ConsultarClimaUseCase crearConsultarClimaService() {
         GeocodingPort geocoding =
                 new OpenMeteoGeocodingAdapter();
 
         WeatherApiPort weatherApi =
                 new OpenMeteoWeatherAdapter();
 
-        ConsultarClimaUseCase consultarClima =
-                new ConsultarClimaService(geocoding, weatherApi);
-
-        return new WeatherNotificationService(consultarClima);
+        return new ConsultarClimaService(geocoding, weatherApi);
     }
 
+    /** Inicializa controles, ciudades disponibles y datos de la tabla. */
     @FXML
     private void initialize() {
         colId.setCellValueFactory(
@@ -145,12 +156,14 @@ public class Controller {
         cargarDrones();
     }
 
+    /** Limpia el formulario para iniciar el registro de un drone. */
     @FXML
     private void nuevoDron() {
         limpiarFormulario();
         tblDrones.getSelectionModel().clearSelection();
     }
 
+    /** Registra el drone descrito en el formulario. */
     @FXML
     private void guardarDron() {
         try {
@@ -162,6 +175,7 @@ public class Controller {
         }
     }
 
+    /** Actualiza el drone seleccionado con los datos del formulario. */
     @FXML
     private void editarDron() {
         try {
@@ -185,6 +199,7 @@ public class Controller {
         }
     }
 
+    /** Elimina el drone seleccionado y lo da de baja de las notificaciones. */
     @FXML
     private void eliminarDron() {
         try {
@@ -208,6 +223,7 @@ public class Controller {
         }
     }
 
+    /** Suscribe el drone seleccionado a las notificaciones meteorológicas. */
     @FXML
     private void suscribirDrone() {
         Drone seleccionado =
@@ -228,6 +244,7 @@ public class Controller {
                 + " recibirá las notificaciones meteorológicas.");
     }
 
+    /** Cancela la suscripción meteorológica del drone seleccionado. */
     @FXML
     private void desuscribirDrone() {
         Drone seleccionado =
@@ -248,6 +265,7 @@ public class Controller {
                 + " ya no recibirá notificaciones meteorológicas.");
     }
 
+    /** Consulta el clima, evalúa la viabilidad y notifica a los drones. */
     @FXML
     private void notificarDrones() {
         String ciudad = cbCiudad.getValue();
@@ -260,13 +278,13 @@ public class Controller {
         }
 
         try {
-            // Consulta las API y notifica a los drones suscritos.
-            weatherService.actualizarDesdeCiudad(ciudad);
+            var clima = consultarClima.consultarClima(ciudad);
+            String resultado = evaluarViabilidad.evaluarViabilidad(ciudad, clima);
+            weatherService.notificar(clima, resultado);
 
             mostrarInformacion(
-                    "Consulta completada",
-                    "Se consultó el clima de " + ciudad
-                    + " y se procesaron las notificaciones.");
+                    "Viabilidad de vuelo en " + ciudad,
+                    resultado + "\n\nSe notificó a los drones suscritos.");
 
         } catch (IOException exception) {
             mostrarError(
@@ -287,6 +305,7 @@ public class Controller {
         }
     }
 
+    /** Carga en la tabla los drones almacenados. */
     private void cargarDrones() {
         try {
             tblDrones.setItems(
@@ -298,6 +317,14 @@ public class Controller {
         }
     }
 
+    /**
+     * Construye un drone con los valores actuales del formulario.
+     *
+     * @param id identificador asignado al drone
+     * @return drone con los datos del formulario
+     * @throws IllegalArgumentException si los campos están vacíos o el peso
+     *         no es válido
+     */
     private Drone leerDrone(int id) {
         String serial = txtSerial.getText().trim();
         String modelo = txtModelo.getText().trim();
@@ -318,6 +345,12 @@ public class Controller {
         }
     }
 
+    /**
+     * Lee el identificador del formulario.
+     *
+     * @return identificador ingresado
+     * @throws IllegalArgumentException si el campo no contiene un ID válido
+     */
     private int leerId() {
         try {
             return Integer.parseInt(txtId.getText().trim());
@@ -329,6 +362,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Copia los datos de un drone a los campos del formulario.
+     *
+     * @param drone drone que se mostrará; si es {@code null}, no realiza cambios
+     */
     private void mostrarDrone(Drone drone) {
         if (drone == null) {
             return;
@@ -341,6 +379,7 @@ public class Controller {
         cbTipo.setValue("Seleccionar");
     }
 
+    /** Vacía los campos del formulario y restablece el selector de tipo. */
     private void limpiarFormulario() {
         txtId.clear();
         txtSerial.clear();
@@ -349,10 +388,22 @@ public class Controller {
         cbTipo.setValue("Seleccionar");
     }
 
+    /**
+     * Muestra un error usando el mensaje de una excepción.
+     *
+     * @param encabezado título del error
+     * @param exception excepción cuyo mensaje se mostrará
+     */
     private void mostrarError(String encabezado, Exception exception) {
         mostrarError(encabezado, exception.getMessage());
     }
 
+    /**
+     * Muestra una alerta de error.
+     *
+     * @param encabezado título del error
+     * @param mensaje detalle del error
+     */
     private void mostrarError(String encabezado, String mensaje) {
         Alert alerta = new Alert(Alert.AlertType.ERROR);
         alerta.setTitle("Gestión de drones");
@@ -361,6 +412,12 @@ public class Controller {
         alerta.showAndWait();
     }
 
+    /**
+     * Muestra una alerta informativa.
+     *
+     * @param encabezado título de la información
+     * @param mensaje detalle informativo
+     */
     private void mostrarInformacion(String encabezado, String mensaje) {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
         alerta.setTitle("Gestión de drones");
@@ -368,21 +425,7 @@ public class Controller {
         alerta.setContentText(mensaje);
         alerta.showAndWait();
     }
-    
-    private void mostrarNotificacionClima(Drone drone, Weather clima) {
-        Alert alerta = new Alert(Alert.AlertType.INFORMATION);
 
-        alerta.setTitle("Notificación meteorológica");
-        alerta.setHeaderText("Clima para el drone: " + drone.getSerial());
-
-        alerta.setContentText(
-                "Temperatura: " + clima.getTemperatura() + " °C\n" +
-                "Humedad: " + clima.getHumedad() + " %\n" +
-                "Velocidad del viento: " + clima.getVelocidadViento() + " km/h\n" +
-                "Presión atmosférica: " + clima.getPresionAtmosferica() + " hPa\n" +
-                "Visibilidad: " + clima.getVisibilidad() + " m"
-        );
-
-        alerta.showAndWait();
-    }
+    private final EvaluarViabilidadVueloUseCase evaluarViabilidad =
+            new EvaluarViabilidadVueloService();
 }

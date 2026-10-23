@@ -10,18 +10,26 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Implementa la persistencia de drones mediante MySQL. */
 public class MysqlDroneRepository implements DroneRepository {
 
     private final conexionDB conexion;
 
+    /** Crea el repositorio usando la conexión MySQL compartida. */
     public MysqlDroneRepository() {
         this(conexionDB.getInstance());
     }
 
+    /**
+     * Crea el repositorio con una conexión proporcionada.
+     *
+     * @param conexion administrador de la conexión a la base de datos
+     */
     MysqlDroneRepository(conexionDB conexion) {
         this.conexion = conexion;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Drone guardar(Drone drone) {
         String sql = "INSERT INTO drone (serial , modelo, peso) VALUES ( ?, ?, ?)";
@@ -47,6 +55,7 @@ public class MysqlDroneRepository implements DroneRepository {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Drone buscarPorId(int id) {
         String sql = "SELECT id, serial, modelo, peso FROM drone WHERE id = ?";
@@ -64,6 +73,7 @@ public class MysqlDroneRepository implements DroneRepository {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Drone> buscarTodos() {
         String sql = "SELECT id, serial, modelo, peso FROM drone";
@@ -83,6 +93,7 @@ public class MysqlDroneRepository implements DroneRepository {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Drone modificar(int id, Drone drone) {
         String sql = "UPDATE drone SET serial = ?, modelo = ?,  peso = ? WHERE id = ?";
@@ -105,6 +116,7 @@ public class MysqlDroneRepository implements DroneRepository {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void eliminarPorId(int id) {
         String sql = "DELETE FROM drone WHERE id = ?";
