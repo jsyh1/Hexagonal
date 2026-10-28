@@ -1,4 +1,6 @@
-package co.edu.poli.aplication.domain.strategy;
+package co.edu.poli.aplication.port.in;
+
+import co.edu.poli.aplication.domain.strategy.ConsumoStrategy;
 
 /**
  * Contexto del patrón Strategy para calcular el consumo energético.
