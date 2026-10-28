@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import co.edu.poli.aplication.domain.model.Drone;
 import co.edu.poli.aplication.domain.strategy.AltoRendimientoStrategy;
+import co.edu.poli.aplication.domain.strategy.CalcularConsumoUseCase;
 import co.edu.poli.aplication.domain.strategy.AhorroStrategy;
 import co.edu.poli.aplication.domain.strategy.ConsumoStrategy;
 import co.edu.poli.aplication.domain.strategy.NormalStrategy;
@@ -27,7 +28,6 @@ import co.edu.poli.aplication.service.CrearDroneService;
 import co.edu.poli.aplication.service.EliminarDroneService;
 import co.edu.poli.aplication.service.EvaluarViabilidadVueloService;
 import co.edu.poli.aplication.service.ListarDronesService;
-import co.edu.poli.aplication.usecase.CalcularConsumoUseCase;
 import co.edu.poli.aplication.weather.WeatherNotificationService;
 import co.edu.poli.infrastructure.loader.JsonRutaLoader;
 import co.edu.poli.infrastructure.persistence.MysqlDroneRepository;
