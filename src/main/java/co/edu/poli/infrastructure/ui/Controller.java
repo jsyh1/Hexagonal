@@ -8,12 +8,12 @@ import java.util.Optional;
 
 import co.edu.poli.aplication.domain.model.Drone;
 import co.edu.poli.aplication.domain.strategy.AltoRendimientoStrategy;
-import co.edu.poli.aplication.domain.strategy.CalcularConsumoUseCase;
 import co.edu.poli.aplication.domain.strategy.AhorroStrategy;
 import co.edu.poli.aplication.domain.strategy.ConsumoStrategy;
 import co.edu.poli.aplication.domain.strategy.NormalStrategy;
 import co.edu.poli.aplication.domain.strategy.PuntoGeografico;
 import co.edu.poli.aplication.port.in.ActualizarDroneUseCase;
+import co.edu.poli.aplication.port.in.CalcularConsumoUseCase;
 import co.edu.poli.aplication.port.in.ConsultarClimaUseCase;
 import co.edu.poli.aplication.port.in.CrearDroneUseCase;
 import co.edu.poli.aplication.port.in.EliminarDroneUseCase;
