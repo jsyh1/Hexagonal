@@ -2,10 +2,16 @@ package co.edu.poli.infrastructure.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Function;
 
+import co.edu.poli.aplication.domain.command.DroneCommand;
+import co.edu.poli.aplication.domain.command.EscanearZonaCommand;
+import co.edu.poli.aplication.domain.command.MedirTemperaturaCommand;
+import co.edu.poli.aplication.domain.command.TomarFotografiaCommand;
 import co.edu.poli.aplication.domain.model.Drone;
 import co.edu.poli.aplication.domain.strategy.AltoRendimientoStrategy;
 import co.edu.poli.aplication.domain.strategy.AhorroStrategy;
@@ -25,9 +31,11 @@ import co.edu.poli.aplication.port.out.WeatherApiPort;
 import co.edu.poli.aplication.service.ActualizarDroneService;
 import co.edu.poli.aplication.service.ConsultarClimaService;
 import co.edu.poli.aplication.service.CrearDroneService;
+import co.edu.poli.aplication.service.DroneOperacionService;
 import co.edu.poli.aplication.service.EliminarDroneService;
 import co.edu.poli.aplication.service.EvaluarViabilidadVueloService;
 import co.edu.poli.aplication.service.ListarDronesService;
+import co.edu.poli.aplication.service.ProgramadorTareas;
 import co.edu.poli.aplication.weather.WeatherNotificationService;
 import co.edu.poli.infrastructure.loader.JsonRutaLoader;
 import co.edu.poli.infrastructure.persistence.MysqlDroneRepository;
@@ -752,4 +760,57 @@ public class Controller {
 
         alerta.showAndWait();
     }
+
+        private final ProgramadorTareas programadorTareas = new ProgramadorTareas();
+        private final List<String> tareasProgramadas = new ArrayList<>();
+
+        @FXML
+        private Label lblTareas;
+
+        private void programar(String nombre,
+        Function<DroneOperacionService, DroneCommand> fabrica) {
+
+    Drone drone = cbDroneConsumo.getValue();
+
+    if (drone == null) {
+        mostrarInformacion("Programar tarea", "Selecciona un dron primero.");
+        return;
+    }
+
+        programadorTareas.programar(fabrica.apply(new DroneOperacionService(drone)));
+        tareasProgramadas.add(nombre);
+        lblTareas.setText("Tareas programadas: " + String.join(" → ", tareasProgramadas));
+        }
+
+        @FXML
+        private void programarFotografia() {
+        programar("Tomar fotografía", TomarFotografiaCommand::new);
+        }
+
+        @FXML
+        private void programarEscaneo() {
+        programar("Escanear zona", EscanearZonaCommand::new);
+        }
+
+        @FXML   
+        private void programarTemperatura() {
+        programar("Medir temperatura", MedirTemperaturaCommand::new);
+        }
+
+        @FXML
+        private void ejecutarTareas() {
+        try {
+                List<String> resultados = programadorTareas.ejecutarTodas();
+                mostrarInformacion("Resultados de la misión", String.join("\n", resultados));
+        } catch (IllegalStateException exception) {
+                mostrarInformacion("Ejecutar tareas", exception.getMessage());
+        }
+        }
+
+        @FXML
+        private void limpiarTareas() {
+        programadorTareas.limpiar();
+        tareasProgramadas.clear();
+        lblTareas.setText("Tareas programadas: ninguna");
+        }
 }
