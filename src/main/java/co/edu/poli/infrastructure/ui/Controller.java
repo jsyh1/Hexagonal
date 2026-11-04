@@ -45,6 +45,10 @@ import co.edu.poli.infrastructure.persistence.MysqlDroneRepository;
 import co.edu.poli.infrastructure.util.HaversineUtil;
 import co.edu.poli.infrastructure.weather.OpenMeteoGeocodingAdapter;
 import co.edu.poli.infrastructure.weather.OpenMeteoWeatherAdapter;
+import co.edu.poli.aplication.mediator.MissionCoordinator;
+import co.edu.poli.aplication.port.in.ExecuteMissionUseCase;
+import co.edu.poli.aplication.service.MissionService;
+
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -60,6 +64,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import javafx.scene.control.TextArea;
 
 /**
  * Controlador de la interfaz JavaFX de gestión de drones,
