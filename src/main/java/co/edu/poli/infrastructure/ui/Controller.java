@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import co.edu.poli.aplication.domain.command.DroneCommand;
@@ -25,6 +26,7 @@ import co.edu.poli.aplication.port.in.CrearDroneUseCase;
 import co.edu.poli.aplication.port.in.EliminarDroneUseCase;
 import co.edu.poli.aplication.port.in.EvaluarViabilidadVueloUseCase;
 import co.edu.poli.aplication.port.in.ListarDronesUseCase;
+import co.edu.poli.aplication.port.in.ManageDroneStateUseCase;
 import co.edu.poli.aplication.port.out.DroneRepository;
 import co.edu.poli.aplication.port.out.GeocodingPort;
 import co.edu.poli.aplication.port.out.WeatherApiPort;
@@ -32,6 +34,7 @@ import co.edu.poli.aplication.service.ActualizarDroneService;
 import co.edu.poli.aplication.service.ConsultarClimaService;
 import co.edu.poli.aplication.service.CrearDroneService;
 import co.edu.poli.aplication.service.DroneOperacionService;
+import co.edu.poli.aplication.service.DroneStateService;
 import co.edu.poli.aplication.service.EliminarDroneService;
 import co.edu.poli.aplication.service.EvaluarViabilidadVueloService;
 import co.edu.poli.aplication.service.ListarDronesService;
@@ -43,6 +46,7 @@ import co.edu.poli.infrastructure.util.HaversineUtil;
 import co.edu.poli.infrastructure.weather.OpenMeteoGeocodingAdapter;
 import co.edu.poli.infrastructure.weather.OpenMeteoWeatherAdapter;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -100,6 +104,9 @@ public class Controller {
     @FXML
     private TableColumn<Drone, Double> colPeso;
 
+    @FXML
+    private TableColumn<Drone, String> colEstado;
+
     // Controles para el cálculo de consumo energético.
 
     @FXML
@@ -149,6 +156,9 @@ public class Controller {
 
     private final ListarDronesUseCase listarDrones =
             new ListarDronesService(droneRepository);
+
+    private final ManageDroneStateUseCase gestionarEstadoDrone =
+            new DroneStateService();
 
     private final ConsultarClimaUseCase consultarClima =
             crearConsultarClimaService();
@@ -203,6 +213,10 @@ public class Controller {
 
         colPeso.setCellValueFactory(
                 new PropertyValueFactory<>("peso"));
+
+        colEstado.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(
+                        gestionarEstadoDrone.obtenerEstado(cell.getValue())));
 
         txtId.setEditable(false);
 
@@ -277,7 +291,8 @@ public class Controller {
     @FXML
     private void guardarDron() {
         try {
-            crearDrone.crearDrone(leerDrone(0));
+            Drone creado = crearDrone.crearDrone(leerDrone(0));
+            gestionarEstadoDrone.registrarDrone(creado);
             cargarDrones();
             limpiarFormulario();
 
@@ -326,6 +341,7 @@ public class Controller {
             eliminarDrone.eliminarDrone(id);
 
             if (seleccionado != null) {
+                gestionarEstadoDrone.eliminarDrone(seleccionado);
                 weatherService.darDeBaja(seleccionado);
             }
 
@@ -430,6 +446,61 @@ public class Controller {
             mostrarError(
                     "Error al consultar el clima",
                     exception.getMessage());
+        }
+    }
+
+    @FXML
+    private void encenderDrone() {
+        ejecutarOperacionEstado("encender", gestionarEstadoDrone::encender);
+    }
+
+    @FXML
+    private void apagarDrone() {
+        ejecutarOperacionEstado("apagar", gestionarEstadoDrone::apagar);
+    }
+
+    @FXML
+    private void despegarDrone() {
+        ejecutarOperacionEstado("despegar", gestionarEstadoDrone::despegar);
+    }
+
+    @FXML
+    private void iniciarAterrizajeDrone() {
+        ejecutarOperacionEstado(
+                "iniciar el aterrizaje",
+                gestionarEstadoDrone::iniciarAterrizaje);
+    }
+
+    @FXML
+    private void finalizarAterrizajeDrone() {
+        ejecutarOperacionEstado(
+                "finalizar el aterrizaje",
+                gestionarEstadoDrone::finalizarAterrizaje);
+    }
+
+    private void ejecutarOperacionEstado(
+            String nombreOperacion,
+            Consumer<Drone> operacion) {
+        Drone seleccionado = tblDrones.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarError(
+                    "Gestión del estado operativo",
+                    "Selecciona un dron de la tabla.");
+            return;
+        }
+
+        try {
+            operacion.accept(seleccionado);
+            tblDrones.refresh();
+            mostrarInformacion(
+                    "Estado operativo actualizado",
+                    "El dron " + seleccionado.getSerial() + " está "
+                            + gestionarEstadoDrone.obtenerEstado(seleccionado)
+                            + ".");
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            mostrarError(
+                    "No se pudo " + nombreOperacion,
+                    exception);
         }
     }
 
@@ -623,6 +694,8 @@ public class Controller {
 
         try {
             List<Drone> drones = listarDrones.listarDrones();
+            drones.forEach(drone ->
+                    gestionarEstadoDrone.registrarDrone(drone));
 
             tblDrones.setItems(
                     FXCollections.observableArrayList(drones));

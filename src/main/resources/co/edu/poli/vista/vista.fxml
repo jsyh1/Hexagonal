@@ -425,8 +425,23 @@
                         <TableColumn fx:id="colPeso"
                                      prefWidth="150"
                                      text="Peso" />
+                       <TableColumn fx:id="colEstado"
+                                    prefWidth="150"
+                                    text="Estado operativo" />
                     </columns>
                 </TableView>
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Button onAction="#encenderDrone"
+                            text="Encender" />
+                    <Button onAction="#apagarDrone"
+                            text="Apagar" />
+                    <Button onAction="#despegarDrone"
+                            text="Despegar" />
+                    <Button onAction="#iniciarAterrizajeDrone"
+                            text="Iniciar aterrizaje" />
+                    <Button onAction="#finalizarAterrizajeDrone"
+                            text="Finalizar aterrizaje" />
+                </HBox>
             </VBox>
         </VBox>
     </center>

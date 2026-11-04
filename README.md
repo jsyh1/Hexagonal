@@ -59,6 +59,11 @@ geocodificación y pronóstico de Open-Meteo.
   notifica a cada drone suscrito con el clima y el resultado de viabilidad.
 - **Cadena de responsabilidades:** los manejadores meteorológicos evalúan
   secuencialmente las condiciones para determinar si el vuelo es apto.
+- **State:** `DroneStateService` mantiene el estado operativo de cada dron
+  separado del modelo `Drone`, y delega las transiciones en `OffState`,
+  `ReadyState`, `FlyingState` y `LandingState`. Los estados se muestran y
+  administran desde la interfaz JavaFX; se mantienen en memoria y los drones
+  se inicializan apagados al iniciar la aplicación.
 - **Arquitectura hexagonal:** los casos de uso y puertos están separados de
   los adaptadores de interfaz, persistencia y servicios meteorológicos.
 
@@ -68,6 +73,7 @@ geocodificación y pronóstico de Open-Meteo.
 src/main/java/co/edu/poli/
   aplication/
     domain/model/       Modelo de dominio y manejadores de clima
+    domain/state/       Estados operativos de drones
     port/               Contratos de entrada y salida
     service/            Casos de uso
     weather/            Notificaciones a drones suscritos
