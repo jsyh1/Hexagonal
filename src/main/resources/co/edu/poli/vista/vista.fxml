@@ -13,6 +13,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextArea?>
 <BorderPane style="-fx-background-color: #f4f6f8;"
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -307,6 +308,7 @@
            style="-fx-font-size: 11px;
                   -fx-text-fill: #7f8c8d;" />
 </VBox>
+
             <!-- ===================================================== -->
             <!-- PANEL DE PROGRAMACION DE TAREAS (COMMAND) -->
             <!-- ===================================================== -->
@@ -383,6 +385,45 @@
                                    -fx-background-radius: 5;
                                    -fx-cursor: hand;" />
                 </HBox>
+            </VBox>
+            <!-- ===================================================== -->
+            <!-- PANEL DE COORDINACION DE MISION (MEDIATOR) -->
+            <!-- ===================================================== -->
+            <VBox spacing="12"
+                  style="-fx-background-color: white;
+                         -fx-background-radius: 8;
+                         -fx-border-radius: 8;
+                         -fx-border-color: #e0e4e8;">
+                <padding>
+                    <Insets bottom="18" left="20" right="20" top="18" />
+                </padding>
+                <Label text="Coordinación de misión (Mediator)"
+                       style="-fx-font-size: 16px;
+                              -fx-font-weight: bold;
+                              -fx-text-fill: #2c3e50;" />
+                <Label text="Selecciona un dron en el panel de consumo. El mediador coordina ruta, sensores, batería y comunicación."
+                       wrapText="true"
+                       style="-fx-font-size: 11px;
+                              -fx-text-fill: #7f8c8d;" />
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Batería (%):" style="-fx-font-weight: bold;" />
+                    <TextField fx:id="txtBateriaMision"
+                               text="100"
+                               prefWidth="70" />
+                    <Button text="Iniciar misión"
+                            onAction="#iniciarMision"
+                            prefHeight="32"
+                            style="-fx-background-color: #c0392b;
+                                   -fx-text-fill: white;
+                                   -fx-font-weight: bold;
+                                   -fx-background-radius: 5;
+                                   -fx-cursor: hand;" />
+                </HBox>
+                <TextArea fx:id="txtBitacoraMision"
+                          editable="false"
+                          prefRowCount="8"
+                          wrapText="true"
+                          promptText="Aquí se mostrará la bitácora de la misión..." />
             </VBox>
             <!-- ===================================================== -->
             <!-- TABLA -->
