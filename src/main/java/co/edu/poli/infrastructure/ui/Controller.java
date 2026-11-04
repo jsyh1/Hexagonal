@@ -886,4 +886,42 @@ public class Controller {
         tareasProgramadas.clear();
         lblTareas.setText("Tareas programadas: ninguna");
         }
+        // Controles y lógica del patrón Mediator.
+
+    @FXML
+    private TextField txtBateriaMision;
+
+    @FXML
+    private TextArea txtBitacoraMision;
+
+    @FXML
+    private void iniciarMision() {
+
+        Drone drone = cbDroneConsumo.getValue();
+
+        if (drone == null) {
+            mostrarInformacion("Iniciar misión", "Selecciona un dron primero.");
+            return;
+        }
+
+        int bateria;
+
+        try {
+            bateria = Integer.parseInt(txtBateriaMision.getText().trim());
+        } catch (NumberFormatException exception) {
+            mostrarError("Iniciar misión", "La batería debe ser un número entero entre 0 y 100.");
+            return;
+        }
+
+        if (bateria < 0 || bateria > 100) {
+            mostrarError("Iniciar misión", "La batería debe estar entre 0 y 100.");
+            return;
+        }
+
+        // Un mediador nuevo por operación, porque guarda el estado de la misión.
+        ExecuteMissionUseCase ejecutarMision =
+                new MissionService(new MissionCoordinator(bateria));
+
+        txtBitacoraMision.setText(ejecutarMision.ejecutarMision(drone));
+    }
 }
