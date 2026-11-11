@@ -1,22 +1,7 @@
 package co.edu.poli.aplication.domain.state;
 
 /** Estado de un dron en vuelo. */
-public final class FlyingState implements DroneState {
-
-    @Override
-    public DroneState encender() {
-        return operacionNoPermitida("encender");
-    }
-
-    @Override
-    public DroneState apagar() {
-        return operacionNoPermitida("apagar");
-    }
-
-    @Override
-    public DroneState despegar() {
-        return operacionNoPermitida("despegar");
-    }
+public final class FlyingState extends OffState.RestrictedState {
 
     @Override
     public DroneState iniciarAterrizaje() {
@@ -25,7 +10,7 @@ public final class FlyingState implements DroneState {
 
     @Override
     public DroneState finalizarAterrizaje() {
-        return operacionNoPermitida("finalizar el aterrizaje");
+        throw operacionNoPermitida("finalizar el aterrizaje");
     }
 
     @Override

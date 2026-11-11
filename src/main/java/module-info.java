@@ -1,5 +1,6 @@
 module co.edu.poli {
     requires javafx.controls;
+    requires transitive javafx.graphics;
     requires javafx.fxml;
 	requires java.sql;
 	requires io.github.cdimascio.dotenv.java;

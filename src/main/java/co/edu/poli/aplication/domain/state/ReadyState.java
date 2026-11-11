@@ -5,7 +5,7 @@ public final class ReadyState implements DroneState {
 
     @Override
     public DroneState encender() {
-        return operacionNoPermitida("encender");
+        throw operacionNoPermitida("encender");
     }
 
     @Override
@@ -20,12 +20,12 @@ public final class ReadyState implements DroneState {
 
     @Override
     public DroneState iniciarAterrizaje() {
-        return operacionNoPermitida("iniciar el aterrizaje");
+        throw operacionNoPermitida("iniciar el aterrizaje");
     }
 
     @Override
     public DroneState finalizarAterrizaje() {
-        return operacionNoPermitida("finalizar el aterrizaje");
+        throw operacionNoPermitida("finalizar el aterrizaje");
     }
 
     @Override

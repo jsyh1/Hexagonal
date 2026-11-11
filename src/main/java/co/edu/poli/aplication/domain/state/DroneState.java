@@ -15,8 +15,8 @@ public interface DroneState {
 
     String nombre();
 
-    default DroneState operacionNoPermitida(String operacion) {
-        throw new IllegalStateException(
+    default IllegalStateException operacionNoPermitida(String operacion) {
+        return new IllegalStateException(
                 "No se puede " + operacion + " cuando el dron está "
                         + nombre() + ".");
     }
