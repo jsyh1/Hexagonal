@@ -5,6 +5,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,11 +21,16 @@ import co.edu.poli.aplication.port.out.WeatherApiPort;
 /** Adaptador que obtiene las condiciones meteorológicas desde Open-Meteo. */
 public class OpenMeteoWeatherAdapter implements WeatherApiPort {
 
-	private final HttpClient httpClient = HttpClient.newHttpClient();
+	private final HttpClient httpClient;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
     /** Crea un adaptador meteorológico con un cliente HTTP predeterminado. */
     public OpenMeteoWeatherAdapter() {
+		this(HttpClient.newHttpClient());
+    }
+
+    OpenMeteoWeatherAdapter(HttpClient httpClient) {
+		this.httpClient = httpClient;
     }
 
     /**
@@ -62,16 +72,17 @@ public class OpenMeteoWeatherAdapter implements WeatherApiPort {
 		double presionAtmosferica = actual.path("surface_pressure").asDouble();
 
 		String horaActual = actual.path("time").asText();
+		String zonaHoraria = json.path("timezone").asText(null);
 
 		JsonNode horas = json.path("hourly").path("time");
 		JsonNode visibilidades = json.path("hourly").path("visibility");
 
-		double visibilidad = buscarVisibilidad(horas, visibilidades, horaActual);
+		double visibilidad = buscarVisibilidad(horas, visibilidades, horaActual, zonaHoraria);
 
 		return new Weather(null, temperatura, humedad, velocidadViento, presionAtmosferica, visibilidad);
 	}
 
-	private double buscarVisibilidad(JsonNode horas, JsonNode visibilidades, String horaActual) {
+	double buscarVisibilidad(JsonNode horas, JsonNode visibilidades, String horaActual, String zonaHoraria) {
 
 		if (!horas.isArray() || !visibilidades.isArray() || horas.isEmpty() || visibilidades.isEmpty()) {
 			throw new RuntimeException("La API no devolvió datos de visibilidad.");
@@ -88,7 +99,11 @@ public class OpenMeteoWeatherAdapter implements WeatherApiPort {
 
 		// Si no coincide, buscamos la hora más cercana.
 		try {
-			java.time.LocalDateTime actual = java.time.LocalDateTime.parse(horaActual);
+			if (zonaHoraria == null || zonaHoraria.isBlank()) {
+				throw new DateTimeException("La respuesta no contiene una zona horaria.");
+			}
+			ZoneId zona = ZoneId.of(zonaHoraria);
+			ZonedDateTime actual = LocalDateTime.parse(horaActual).atZone(zona);
 
 			int indiceCercano = -1;
 			long diferenciaMinima = Long.MAX_VALUE;
@@ -98,9 +113,9 @@ public class OpenMeteoWeatherAdapter implements WeatherApiPort {
 					continue;
 				}
 
-				java.time.LocalDateTime hora = java.time.LocalDateTime.parse(horas.get(i).asText());
+				ZonedDateTime hora = LocalDateTime.parse(horas.get(i).asText()).atZone(zona);
 
-				long diferencia = Math.abs(java.time.Duration.between(actual, hora).toMinutes());
+				long diferencia = Math.abs(Duration.between(actual, hora).toMinutes());
 
 				if (diferencia < diferenciaMinima) {
 					diferenciaMinima = diferencia;
@@ -113,8 +128,9 @@ public class OpenMeteoWeatherAdapter implements WeatherApiPort {
 				return visibilidades.get(indiceCercano).asDouble();
 			}
 
-		} catch (java.time.format.DateTimeParseException e) {
-			throw new RuntimeException("La API devolvió un formato de hora inesperado: " + horaActual, e);
+		} catch (DateTimeException e) {
+			throw new RuntimeException(
+					"La API devolvió una zona horaria o un formato de hora inesperado: " + horaActual, e);
 		}
 
 		throw new RuntimeException("No se encontró una visibilidad cercana a la hora actual: " + horaActual);

@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -43,7 +44,12 @@
     <!-- CONTENIDO CENTRAL -->
     <!-- ===================================================== -->
     <center>
-        <VBox spacing="18">
+        <ScrollPane fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    style="-fx-background: #f4f6f8; -fx-background-color: #f4f6f8;">
+            <content>
+                <VBox spacing="18">
             <padding>
                 <Insets bottom="25"
                         left="25"
@@ -484,6 +490,8 @@
                             text="Finalizar aterrizaje" />
                 </HBox>
             </VBox>
-        </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>

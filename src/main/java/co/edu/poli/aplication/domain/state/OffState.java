@@ -10,26 +10,49 @@ public final class OffState implements DroneState {
 
     @Override
     public DroneState apagar() {
-        return operacionNoPermitida("apagar");
+        throw operacionNoPermitida("apagar");
     }
 
     @Override
     public DroneState despegar() {
-        return operacionNoPermitida("despegar");
+        throw operacionNoPermitida("despegar");
     }
 
     @Override
     public DroneState iniciarAterrizaje() {
-        return operacionNoPermitida("iniciar el aterrizaje");
+        throw operacionNoPermitida("iniciar el aterrizaje");
     }
 
     @Override
     public DroneState finalizarAterrizaje() {
-        return operacionNoPermitida("finalizar el aterrizaje");
+        throw operacionNoPermitida("finalizar el aterrizaje");
     }
 
     @Override
     public String nombre() {
         return "APAGADO";
+    }
+
+    static abstract class RestrictedState implements DroneState {
+        @Override
+        public DroneState encender() {
+            throw operacionNoPermitida("encender");
+        }
+
+        @Override
+        public DroneState apagar() {
+            throw operacionNoPermitida("apagar");
+        }
+
+        @Override
+        public DroneState despegar() {
+            throw operacionNoPermitida("despegar");
+        }
+
+        @Override
+        public DroneState iniciarAterrizaje() {
+            throw operacionNoPermitida("iniciar el aterrizaje");
+        }
+
     }
 }
